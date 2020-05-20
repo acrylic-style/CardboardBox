@@ -1,15 +1,15 @@
 package xyz.acrylicstyle.cardboard.utils;
 
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.acrylicstyle.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import xyz.acrylicstyle.minecraft.v1_15_R1.NBTTagCompound;
 
 public class CardboardBox {
     @NotNull
-    private final net.minecraft.server.v1_15_R1.ItemStack handle;
+    private final xyz.acrylicstyle.minecraft.v1_15_R1.ItemStack handle;
     @NotNull
     private NBTTagCompound tag;
     @NotNull
@@ -33,7 +33,7 @@ public class CardboardBox {
     }
 
     @NotNull
-    public net.minecraft.server.v1_15_R1.ItemStack getHandle() {
+    public xyz.acrylicstyle.minecraft.v1_15_R1.ItemStack getHandle() {
         return handle;
     }
 

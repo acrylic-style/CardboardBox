@@ -1,14 +1,14 @@
 package xyz.acrylicstyle.cardboard.utils;
 
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import xyz.acrylicstyle.cardboard.CardboardBoxPlugin;
+import xyz.acrylicstyle.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import xyz.acrylicstyle.minecraft.v1_15_R1.NBTTagCompound;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class CardboardBoxUtils {
             meta.removeEnchant(Enchantment.PROTECTION_ENVIRONMENTAL);
         }
         itemStack.setItemMeta(meta);
-        net.minecraft.server.v1_15_R1.ItemStack handle = CraftItemStack.asNMSCopy(itemStack);
+        xyz.acrylicstyle.minecraft.v1_15_R1.ItemStack handle = CraftItemStack.asNMSCopy(itemStack);
         NBTTagCompound tag = handle.getOrCreateTag();
         tag.setString("cardboardUUID", UUID.randomUUID().toString());
         handle.setTag(tag);
