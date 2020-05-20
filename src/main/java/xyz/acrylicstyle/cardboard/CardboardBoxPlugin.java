@@ -26,6 +26,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import util.Collection;
 import xyz.acrylicstyle.cardboard.utils.CardboardBox;
 import xyz.acrylicstyle.cardboard.utils.CardboardBoxUtils;
+import xyz.acrylicstyle.tomeito_api.utils.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -180,6 +181,8 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
                 Bukkit.getOnlinePlayers().forEach(p -> p.sendBlockChange(l.getLocation(), Material.AIR, (byte) 0));
             } else l.setType(Material.AIR);
             e.getPlayer().getInventory().setItemInMainHand(cardboardBox.getItemStack());
+            Log.debug("Removing TileEntity at " + l.getX() + "," + l.getY() + "," + l.getZ());
+            ((CraftWorld) e.getBlockAgainst().getWorld()).getHandle().removeTileEntity(new BlockPosition(l.getX(), l.getY(), l.getZ()));
             e.getPlayer().sendActionBar(ChatColor.GREEN + "段ボール箱の中にブロックを入れました。");
         } else {
             Block l = e.getBlockPlaced();
