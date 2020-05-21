@@ -181,7 +181,7 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
                 new CraftChunk(l.getChunk())
                         .getHandle()
                         .getSections()[l.getY() >> 4]
-                        .setType(l.getX() & 15, l.getY() & 15, l.getZ() & 15, xyz.acrylicstyle.minecraft.v1_15_R1.Block.getByCombinedId(0));
+                        .setType(l.getX() & 15, l.getY() & 15, l.getZ() & 15, xyz.acrylicstyle.minecraft.v1_15_R1.Block.getByCombinedIdRaw(0));
                 Bukkit.getOnlinePlayers().forEach(p -> p.sendBlockChange(l.getLocation(), Material.AIR, (byte) 0));
             } else l.setType(Material.AIR);
             e.getPlayer().getInventory().setItemInMainHand(cardboardBox.getItemStack());
