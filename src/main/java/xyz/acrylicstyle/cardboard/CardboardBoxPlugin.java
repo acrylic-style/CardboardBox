@@ -17,7 +17,6 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import util.Collection;
 import xyz.acrylicstyle.cardboard.utils.CardboardBox;
 import xyz.acrylicstyle.cardboard.utils.CardboardBoxUtils;
 import xyz.acrylicstyle.craftbukkit.v1_15_R1.CraftChunk;
@@ -36,8 +35,6 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
     public static final Material BLOCK = Material.HONEYCOMB_BLOCK;
     public static final List<Material> disallowedMaterials = new ArrayList<>();
     public static final List<UUID> cooltime = new ArrayList<>();
-    public static final Collection<UUID, Integer> cps = new Collection<>();
-    public static final Collection<UUID, Integer> maxCps = new Collection<>();
 
     static {
         // disallowed blocks
@@ -143,14 +140,6 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
         if (e.getHand() != EquipmentSlot.HAND) return;
-        cps.add(e.getPlayer().getUniqueId(), cps.getOrDefault(e.getPlayer().getUniqueId(), 0)+1);
-        if (maxCps.getOrDefault(e.getPlayer().getUniqueId(), 0) < cps.getOrDefault(e.getPlayer().getUniqueId(), 0)) maxCps.add(e.getPlayer().getUniqueId(), cps.getOrDefault(e.getPlayer().getUniqueId(), 0));
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                cps.add(e.getPlayer().getUniqueId(), cps.getOrDefault(e.getPlayer().getUniqueId(), 0)-1);
-            }
-        }.runTaskLater(this, 20);
         ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
         if (!CardboardBoxUtils.isCardboardBox(item)) return;
         e.setCancelled(true);
