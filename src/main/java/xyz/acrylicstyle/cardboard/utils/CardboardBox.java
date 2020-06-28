@@ -4,12 +4,13 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.acrylicstyle.craftbukkit.v1_15_R1.inventory.CraftItemStack;
-import xyz.acrylicstyle.minecraft.v1_15_R1.NBTTagCompound;
+import xyz.acrylicstyle.paper.Paper;
+import xyz.acrylicstyle.paper.inventory.ItemStackUtils;
+import xyz.acrylicstyle.paper.nbt.NBTTagCompound;
 
 public class CardboardBox {
     @NotNull
-    private final xyz.acrylicstyle.minecraft.v1_15_R1.ItemStack handle;
+    private final ItemStackUtils handle;
     @NotNull
     private NBTTagCompound tag;
     @NotNull
@@ -17,24 +18,19 @@ public class CardboardBox {
 
     public CardboardBox(@NotNull ItemStack itemStack) {
         this(itemStack,
-                Material.getMaterial(CraftItemStack.asNMSCopy(itemStack).getOrCreateTag().getString("cardboardMaterial")),
-                CraftItemStack.asNMSCopy(itemStack).getOrCreateTag().getCompound("cardboardData"));
+                Material.getMaterial(Paper.itemStack(itemStack).getOrCreateTag().getString("cardboardMaterial")),
+                Paper.itemStack(itemStack).getOrCreateTag().getCompound("cardboardData"));
     }
 
     public CardboardBox(@NotNull ItemStack itemStack, @Nullable Material material, @NotNull NBTTagCompound tag) {
         if (material == null) material = Material.AIR;
-        this.handle = CraftItemStack.asNMSCopy(itemStack);
+        this.handle = Paper.itemStack(itemStack);
         this.material = material;
         this.tag = tag;
         NBTTagCompound nbt = handle.getOrCreateTag();
         nbt.set("cardboardData", tag);
         nbt.setString("cardboardMaterial", material.name());
         handle.setTag(nbt);
-    }
-
-    @NotNull
-    public xyz.acrylicstyle.minecraft.v1_15_R1.ItemStack getHandle() {
-        return handle;
     }
 
     @NotNull
@@ -69,8 +65,7 @@ public class CardboardBox {
     }
 
     public ItemStack getItemStack() {
-        ItemStack item = CraftItemStack.asBukkitCopy(handle);
-        return CardboardBoxUtils.updateCardboardBox(item);
+        return CardboardBoxUtils.updateCardboardBox(handle.getItemStack());
     }
 
     public boolean hasData() {

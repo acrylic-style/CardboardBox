@@ -7,8 +7,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import xyz.acrylicstyle.cardboard.CardboardBoxPlugin;
-import xyz.acrylicstyle.craftbukkit.v1_15_R1.inventory.CraftItemStack;
-import xyz.acrylicstyle.minecraft.v1_15_R1.NBTTagCompound;
+import xyz.acrylicstyle.paper.Paper;
+import xyz.acrylicstyle.paper.inventory.ItemStackUtils;
+import xyz.acrylicstyle.paper.nbt.NBTTagCompound;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,14 +18,16 @@ import java.util.UUID;
 public class CardboardBoxUtils {
     public static boolean isCardboardBox(@NotNull ItemStack item) {
         if (item.getType() != CardboardBoxPlugin.BLOCK) return false;
-        return CraftItemStack.asNMSCopy(item).getOrCreateTag().hasKey("cardboardData");
+        return Paper.itemStack(item).getOrCreateTag().hasKey("cardboardData");
     }
 
+    /*
     @NotNull
     public static NBTTagCompound getCardboardBoxTag(@NotNull ItemStack item) {
         if (!isCardboardBox(item)) return new NBTTagCompound();
-        return CraftItemStack.asNMSCopy(item).getOrCreateTag().getCompound("cardboardData");
+        return Paper.itemStack(item).getOrCreateTag().getCompound("cardboardData");
     }
+    */
 
     public static CardboardBox getCardboardBox(@NotNull ItemStack itemStack) {
         if (!isCardboardBox(itemStack)) throw new IllegalArgumentException("This item isn't cardboard box!");
@@ -49,10 +52,10 @@ public class CardboardBoxUtils {
             meta.removeEnchant(Enchantment.PROTECTION_ENVIRONMENTAL);
         }
         itemStack.setItemMeta(meta);
-        xyz.acrylicstyle.minecraft.v1_15_R1.ItemStack handle = CraftItemStack.asNMSCopy(itemStack);
-        NBTTagCompound tag = handle.getOrCreateTag();
+        ItemStackUtils util = Paper.itemStack(itemStack);
+        NBTTagCompound tag = util.getOrCreateTag();
         tag.setString("cardboardUUID", UUID.randomUUID().toString());
-        handle.setTag(tag);
-        return CraftItemStack.asBukkitCopy(handle);
+        util.setTag(tag);
+        return util.getItemStack();
     }
 }
