@@ -17,6 +17,7 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import util.reflect.Ref;
 import xyz.acrylicstyle.cardboard.utils.CardboardBox;
 import xyz.acrylicstyle.cardboard.utils.CardboardBoxUtils;
 import xyz.acrylicstyle.paper.Paper;
@@ -161,15 +162,25 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
             }
             TileEntity te = e.getBlockPlaced().getWorld().getTileEntity(l.getLocation());
             NBTTagCompound tag = new NBTTagCompound();
-            if (te != null) te.save(tag);
+            if (te != null) {
+                Object nms = Ref.getClass(te.getClass()).getMethod("getHandle").invokeObj(te);
+                Object nmsTag = Ref.forName("xyz.acrylicstyle.paper.nbt.CraftNBT")
+                        .getMethod("asNMSCompound", NBTTagCompound.class)
+                        .invoke(null, tag);
+                Ref.getClass(nms.getClass()).getMethod("save", xyz.acrylicstyle.minecraft.NBTTagCompound.CLASS).invokeObj(nms, nmsTag);
+                tag = (NBTTagCompound) Ref.forName("xyz.acrylicstyle.paper.nbt.CraftNBT")
+                        .getMethod("asBukkitCompound", xyz.acrylicstyle.minecraft.NBTTagCompound.CLASS)
+                        .invoke(null, nmsTag);
+                te.save(tag);
+            }
             cardboardBox.store(e.getBlockAgainst().getType(), tag);
-            if (l.getState() instanceof Container) {
-                e.getBlockPlaced().setType(Material.AIR, false);
-                Bukkit.getOnlinePlayers().forEach(p -> p.sendBlockChange(l.getLocation(), Material.AIR, (byte) 0));
-            } else l.setType(Material.AIR);
             e.getPlayer().getInventory().setItemInMainHand(cardboardBox.getItemStack());
             Log.debug("Removing TileEntity at " + l.getX() + "," + l.getY() + "," + l.getZ());
             e.getBlockPlaced().getWorld().removeTileEntity(l.getLocation());
+            if (l.getState() instanceof Container) {
+                l.setType(Material.AIR, false);
+                Bukkit.getOnlinePlayers().forEach(p -> p.sendBlockChange(l.getLocation(), Material.AIR, (byte) 0));
+            } else l.setType(Material.AIR);
             e.getPlayer().sendActionBar(ChatColor.GREEN + "段ボール箱の中にブロックを入れました。");
         } else {
             Block l = e.getBlockPlaced();
