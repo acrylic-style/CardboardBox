@@ -7,6 +7,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -24,6 +25,7 @@ import xyz.acrylicstyle.paper.Paper;
 import xyz.acrylicstyle.paper.block.TileEntity;
 import xyz.acrylicstyle.paper.inventory.ItemStackUtils;
 import xyz.acrylicstyle.paper.nbt.NBTTagCompound;
+import xyz.acrylicstyle.shared.NMSAPI;
 import xyz.acrylicstyle.tomeito_api.utils.Log;
 
 import java.util.ArrayList;
@@ -136,7 +138,7 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
     }
 
     @SuppressWarnings("deprecation")
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e) {
         if (e.getHand() != EquipmentSlot.HAND) return;
         ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
@@ -167,9 +169,9 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
                 Object nmsTag = Ref.forName("xyz.acrylicstyle.paper.nbt.CraftNBT")
                         .getMethod("asNMSCompound", NBTTagCompound.class)
                         .invoke(null, tag);
-                Ref.getClass(nms.getClass()).getMethod("save", xyz.acrylicstyle.minecraft.NBTTagCompound.CLASS).invokeObj(nms, nmsTag);
+                Ref.getClass(nms.getClass()).getMethod("save", NMSAPI.getClassWithoutException("NBTTagCompound")).invokeObj(nms, nmsTag);
                 tag = (NBTTagCompound) Ref.forName("xyz.acrylicstyle.paper.nbt.CraftNBT")
-                        .getMethod("asBukkitCompound", xyz.acrylicstyle.minecraft.NBTTagCompound.CLASS)
+                        .getMethod("asBukkitCompound", NMSAPI.getClassWithoutException("NBTTagCompound"))
                         .invoke(null, nmsTag);
                 te.save(tag);
             }
