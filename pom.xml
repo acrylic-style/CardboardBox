@@ -65,15 +65,9 @@
     </repositories>
     <dependencies>
         <dependency>
-            <groupId>xyz.acrylicstyle.grid</groupId>
-            <artifactId>grid-api</artifactId>
-            <version>1.16.3-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>xyz.acrylicstyle</groupId>
-            <artifactId>api</artifactId>
-            <version>0.5.17</version>
+            <groupId>org.bukkit</groupId>
+            <artifactId>craftbukkit</artifactId>
+            <version>1.17-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

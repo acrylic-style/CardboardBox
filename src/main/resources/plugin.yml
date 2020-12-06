@@ -2,5 +2,3 @@ name: CardboardBox
 main: xyz.acrylicstyle.cardboard.CardboardBoxPlugin
 version: "1.0"
 api-version: "1.15"
-depend:
-  - TomeitoLib
