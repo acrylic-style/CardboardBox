@@ -1,8 +1,8 @@
 package xyz.acrylicstyle.cardboard;
 
-import net.minecraft.server.v1_17_R0.BlockPosition;
-import net.minecraft.server.v1_17_R0.NBTTagCompound;
-import net.minecraft.server.v1_17_R0.TileEntity;
+import net.minecraft.server.v1_16_R3.BlockPosition;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.TileEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -10,8 +10,8 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
-import org.bukkit.craftbukkit.v1_17_R0.CraftWorld;
-import org.bukkit.craftbukkit.v1_17_R0.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -37,7 +37,7 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
     public static final List<UUID> cooltime = new ArrayList<>();
 
     static {
-        // disallowed blocks
+        // disallowed blocks (creative items, indestructible items etc)
         disallowedMaterials.add(Material.BEDROCK);
         disallowedMaterials.add(Material.COMMAND_BLOCK);
         disallowedMaterials.add(Material.CHAIN_COMMAND_BLOCK);
@@ -52,7 +52,7 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
         disallowedMaterials.add(Material.STRUCTURE_VOID);
 
         // bugged blocks
-        // these blocks will causes chunk/block corruption and server crash
+        // these blocks will cause chunk/block corruption and the server crashes when the server tries to load the affected chunk
         disallowedMaterials.add(Material.PISTON);
         disallowedMaterials.add(Material.PISTON_HEAD);
         disallowedMaterials.add(Material.MOVING_PISTON);
@@ -104,7 +104,7 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
         assert meta != null;
         meta.setDisplayName(ChatColor.LIGHT_PURPLE + "段ボール箱");
         result.setItemMeta(meta);
-        net.minecraft.server.v1_17_R0.ItemStack util = CraftItemStack.asNMSCopy(result);
+        net.minecraft.server.v1_16_R3.ItemStack util = CraftItemStack.asNMSCopy(result);
         NBTTagCompound tag = util.getOrCreateTag();
         tag.set("cardboardData", new NBTTagCompound());
         util.setTag(tag);
@@ -187,7 +187,7 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
                         tag.setInt("x", l.getX());
                         tag.setInt("y", l.getY());
                         tag.setInt("z", l.getZ());
-                        te.load(tag);
+                        te.load(((CraftWorld) l.getWorld()).getHandle().getType(blockPosition(l.getLocation())), tag);
                         te.update();
                     }
                     cardboardBox.store(null, null);

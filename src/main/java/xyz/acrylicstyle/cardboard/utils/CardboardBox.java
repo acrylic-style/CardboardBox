@@ -1,12 +1,12 @@
 package xyz.acrylicstyle.cardboard.utils;
 
-import net.minecraft.server.v1_17_R0.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_17_R0.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 public class CardboardBox {
-    private final net.minecraft.server.v1_17_R0.ItemStack handle;
+    private final net.minecraft.server.v1_16_R3.ItemStack handle;
     private NBTTagCompound tag;
     private Material material;
 
