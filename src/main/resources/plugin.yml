@@ -1,4 +1,7 @@
 name: CardboardBox
 main: xyz.acrylicstyle.cardboard.CardboardBoxPlugin
-version: "1.0"
-api-version: "1.15"
+version: @version@
+api-version: "1.20"
+commands:
+  cardboardbox:
+    permission: cardboardbox.command

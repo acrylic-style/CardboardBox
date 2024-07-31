@@ -1,13 +1,13 @@
 package xyz.acrylicstyle.cardboard.utils;
 
-import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 public class CardboardBox {
-    private final net.minecraft.server.v1_16_R3.ItemStack handle;
-    private NBTTagCompound tag;
+    private final net.minecraft.world.item.ItemStack handle;
+    private CompoundTag tag;
     private Material material;
 
     public CardboardBox(ItemStack itemStack) {
@@ -16,25 +16,25 @@ public class CardboardBox {
                 CraftItemStack.asNMSCopy(itemStack).getOrCreateTag().getCompound("cardboardData"));
     }
 
-    public CardboardBox(ItemStack itemStack, Material material, NBTTagCompound tag) {
+    public CardboardBox(ItemStack itemStack, Material material, CompoundTag tag) {
         if (material == null) material = Material.AIR;
         this.handle = CraftItemStack.asNMSCopy(itemStack);
         this.material = material;
         this.tag = tag;
-        NBTTagCompound nbt = handle.getOrCreateTag();
-        nbt.set("cardboardData", tag);
-        nbt.setString("cardboardMaterial", material.name());
+        CompoundTag nbt = handle.getOrCreateTag();
+        nbt.put("cardboardData", tag);
+        nbt.putString("cardboardMaterial", material.name());
         handle.setTag(nbt);
     }
 
-    public NBTTagCompound getTag() {
+    public CompoundTag getTag() {
         return tag;
     }
 
-    public void setTag(NBTTagCompound tag) {
-        if (tag == null) tag = new NBTTagCompound();
-        NBTTagCompound nbt = handle.getOrCreateTag();
-        nbt.set("cardboardData", tag);
+    public void setTag(CompoundTag tag) {
+        if (tag == null) tag = new CompoundTag();
+        CompoundTag nbt = handle.getOrCreateTag();
+        nbt.put("cardboardData", tag);
         handle.setTag(nbt);
         this.tag = tag;
     }
@@ -45,13 +45,13 @@ public class CardboardBox {
 
     public void setType(Material material) {
         if (material == null) material = Material.AIR;
-        NBTTagCompound nbt = handle.getOrCreateTag();
-        nbt.setString("cardboardMaterial", material.name());
+        CompoundTag nbt = handle.getOrCreateTag();
+        nbt.putString("cardboardMaterial", material.name());
         handle.setTag(nbt);
         this.material = material;
     }
 
-    public void store(Material material, NBTTagCompound tag) {
+    public void store(Material material, CompoundTag tag) {
         this.setTag(tag);
         this.setType(material);
     }

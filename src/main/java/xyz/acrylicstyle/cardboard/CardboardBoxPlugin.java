@@ -1,8 +1,10 @@
 package xyz.acrylicstyle.cardboard;
 
-import net.minecraft.server.v1_16_R3.BlockPosition;
-import net.minecraft.server.v1_16_R3.NBTTagCompound;
-import net.minecraft.server.v1_16_R3.TileEntity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -10,11 +12,12 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
@@ -24,11 +27,13 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import xyz.acrylicstyle.cardboard.commands.CardboardBoxCommand;
 import xyz.acrylicstyle.cardboard.utils.CardboardBox;
 import xyz.acrylicstyle.cardboard.utils.CardboardBoxUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class CardboardBoxPlugin extends JavaPlugin implements Listener {
@@ -37,7 +42,7 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
     public static final List<UUID> cooltime = new ArrayList<>();
 
     static {
-        // disallowed blocks (creative items, indestructible items etc)
+        // disallowed blocks (creative items, indestructible items etc.)
         disallowedMaterials.add(Material.BEDROCK);
         disallowedMaterials.add(Material.COMMAND_BLOCK);
         disallowedMaterials.add(Material.CHAIN_COMMAND_BLOCK);
@@ -99,26 +104,29 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
         // XXX
         // X X
         // XXX
-        ItemStack result = new ItemStack(BLOCK);
-        ItemMeta meta = result.getItemMeta();
-        assert meta != null;
-        meta.setDisplayName(ChatColor.LIGHT_PURPLE + "段ボール箱");
-        result.setItemMeta(meta);
-        net.minecraft.server.v1_16_R3.ItemStack util = CraftItemStack.asNMSCopy(result);
-        NBTTagCompound tag = util.getOrCreateTag();
-        tag.set("cardboardData", new NBTTagCompound());
-        util.setTag(tag);
-        result = CraftItemStack.asBukkitCopy(util);
-        CardboardBoxUtils.updateCardboardBox(result);
-        ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "cardboardBox"), result);
-        recipe.shape("XXX", "X X", "XXX");
-        recipe.setIngredient('X', Material.CHEST);
-        Bukkit.addRecipe(recipe);
+        Objects.requireNonNull(getCommand("cardboardbox")).setExecutor(new CardboardBoxCommand());
+        if (!getConfig().getBoolean("disable-recipe", false)) {
+            ItemStack result = new ItemStack(BLOCK);
+            ItemMeta meta = result.getItemMeta();
+            assert meta != null;
+            meta.displayName(Component.text("段ボール箱", NamedTextColor.LIGHT_PURPLE));
+            result.setItemMeta(meta);
+            net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(result);
+            CompoundTag tag = nms.getOrCreateTag();
+            tag.put("cardboardData", new CompoundTag());
+            nms.setTag(tag);
+            result = CraftItemStack.asBukkitCopy(nms);
+            CardboardBoxUtils.updateCardboardBox(result);
+            ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "cardboard_box"), result);
+            recipe.shape("XXX", "X X", "XXX");
+            recipe.setIngredient('X', Material.CHEST);
+            Bukkit.addRecipe(recipe);
+        }
     }
 
     @Override
     public void onDisable() {
-        Bukkit.removeRecipe(new NamespacedKey(this, "cardboardBox"));
+        Bukkit.removeRecipe(new NamespacedKey(this, "cardboard_box"));
     }
 
     @EventHandler
@@ -162,13 +170,17 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
                 e.getPlayer().sendMessage(ChatColor.RED + "このブロックは回収できません。");
                 return;
             }
-            TileEntity te = ((CraftWorld) e.getBlockPlaced().getWorld()).getHandle().getTileEntity(blockPosition(l.getLocation()));
-            NBTTagCompound tag = new NBTTagCompound();
-            if (te != null) te.save(tag);
+            if (!new BlockBreakEvent(l, e.getPlayer()).callEvent()) {
+                e.getPlayer().sendMessage(ChatColor.RED + "このブロックは回収できません。");
+                return;
+            }
+            BlockEntity blockEntity = ((CraftWorld) e.getBlockPlaced().getWorld()).getHandle().getBlockEntity(blockPosition(l.getLocation()));
+            CompoundTag tag = new CompoundTag();
+            if (blockEntity != null) tag.merge(blockEntity.saveWithFullMetadata());
             cardboardBox.store(e.getBlockAgainst().getType(), tag);
             e.getPlayer().getInventory().setItemInMainHand(cardboardBox.getItemStack());
-            getLogger().info("[CardboardBox] Removing TileEntity at " + l.getX() + "," + l.getY() + "," + l.getZ());
-            ((CraftWorld) e.getBlockPlaced().getWorld()).getHandle().removeTileEntity(blockPosition(l.getLocation()));
+            getLogger().info("Removing TileEntity at " + l.getX() + "," + l.getY() + "," + l.getZ());
+            ((CraftWorld) e.getBlockPlaced().getWorld()).getHandle().removeBlockEntity(blockPosition(l.getLocation()));
             if (l.getState() instanceof Container) {
                 l.setType(Material.AIR, false);
                 Bukkit.getOnlinePlayers().forEach(p -> p.sendBlockChange(l.getLocation(), Material.AIR, (byte) 0));
@@ -176,19 +188,22 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
             e.getPlayer().sendMessage(ChatColor.GREEN + "段ボール箱の中にブロックを入れました。");
         } else {
             Block l = e.getBlockPlaced();
-            ((CraftWorld) l.getWorld()).getHandle().removeTileEntity(blockPosition(l.getLocation()));
+            ((CraftWorld) l.getWorld()).getHandle().removeBlockEntity(blockPosition(l.getLocation()));
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     l.setType(cardboardBox.getType());
-                    TileEntity te = ((CraftWorld) l.getWorld()).getHandle().getTileEntity(blockPosition(l.getLocation()));
-                    NBTTagCompound tag = cardboardBox.getTag().clone();
-                    if (te != null) {
-                        tag.setInt("x", l.getX());
-                        tag.setInt("y", l.getY());
-                        tag.setInt("z", l.getZ());
-                        te.load(((CraftWorld) l.getWorld()).getHandle().getType(blockPosition(l.getLocation())), tag);
-                        te.update();
+                    BlockEntity blockEntity = ((CraftWorld) l.getWorld()).getHandle().getBlockEntity(blockPosition(l.getLocation()));
+                    CompoundTag tag = cardboardBox.getTag().copy();
+                    if (blockEntity != null) {
+                        tag.putInt("x", l.getX());
+                        tag.putInt("y", l.getY());
+                        tag.putInt("z", l.getZ());
+                        blockEntity.load(tag);
+                        blockEntity.setLevel(((CraftWorld) l.getWorld()).getHandle());
+                        ((CraftWorld) l.getWorld()).getHandle().setBlockEntity(blockEntity);
+                    } else {
+                        getSLF4JLogger().warn("BlockEntity is null at {},{},{}", l.getX(), l.getY(), l.getZ());
                     }
                     cardboardBox.store(null, null);
                     e.getPlayer().getInventory().setItemInMainHand(cardboardBox.getItemStack());
@@ -198,7 +213,7 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
         }
     }
 
-    public static BlockPosition blockPosition(Location location) {
-        return new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    public static BlockPos blockPosition(Location location) {
+        return new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 }

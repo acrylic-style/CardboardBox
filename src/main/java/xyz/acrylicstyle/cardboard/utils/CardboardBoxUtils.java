@@ -1,8 +1,8 @@
 package xyz.acrylicstyle.cardboard.utils;
 
-import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -16,7 +16,7 @@ import java.util.UUID;
 public class CardboardBoxUtils {
     public static boolean isNotCardboardBox(ItemStack item) {
         if (item.getType() != CardboardBoxPlugin.BLOCK) return true;
-        return !CraftItemStack.asNMSCopy(item).getOrCreateTag().hasKey("cardboardData");
+        return !CraftItemStack.asNMSCopy(item).getOrCreateTag().contains("cardboardData");
     }
 
     public static CardboardBox getCardboardBox(ItemStack itemStack) {
@@ -43,9 +43,9 @@ public class CardboardBoxUtils {
             meta.removeEnchant(Enchantment.PROTECTION_ENVIRONMENTAL);
         }
         itemStack.setItemMeta(meta);
-        net.minecraft.server.v1_16_R3.ItemStack util = CraftItemStack.asNMSCopy(itemStack);
-        NBTTagCompound tag = util.getOrCreateTag();
-        tag.setString("cardboardUUID", UUID.randomUUID().toString());
+        net.minecraft.world.item.ItemStack util = CraftItemStack.asNMSCopy(itemStack);
+        CompoundTag tag = util.getOrCreateTag();
+        tag.putString("cardboardUUID", UUID.randomUUID().toString());
         util.setTag(tag);
         return CraftItemStack.asBukkitCopy(util);
     }
