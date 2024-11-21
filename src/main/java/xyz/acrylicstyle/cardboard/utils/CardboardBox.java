@@ -2,62 +2,65 @@ package xyz.acrylicstyle.cardboard.utils;
 
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class CardboardBox {
-    private final net.minecraft.world.item.ItemStack handle;
+    private ItemStack handle;
     private CompoundTag tag;
     private Material material;
 
-    public CardboardBox(ItemStack itemStack) {
+    public CardboardBox(@NotNull ItemStack itemStack) {
         this(itemStack,
-                Material.getMaterial(CraftItemStack.asNMSCopy(itemStack).getOrCreateTag().getString("cardboardMaterial")),
-                CraftItemStack.asNMSCopy(itemStack).getOrCreateTag().getCompound("cardboardData"));
+                Material.getMaterial(CardboardBoxUtils.getCustomDataOrThrow(itemStack).getString("cardboardMaterial")),
+                CardboardBoxUtils.getCustomDataOrThrow(itemStack).getCompound("cardboardData"));
     }
 
-    public CardboardBox(ItemStack itemStack, Material material, CompoundTag tag) {
+    public CardboardBox(@NotNull ItemStack itemStack, @Nullable Material material, @Nullable CompoundTag tag) {
         if (material == null) material = Material.AIR;
-        this.handle = CraftItemStack.asNMSCopy(itemStack);
         this.material = material;
-        this.tag = tag;
-        CompoundTag nbt = handle.getOrCreateTag();
-        nbt.put("cardboardData", tag);
+        this.tag = tag == null ? new CompoundTag() : tag;
+        CompoundTag nbt = CardboardBoxUtils.getCustomData(itemStack);
+        if (nbt == null) nbt = new CompoundTag();
+        nbt.put("cardboardData", this.tag);
         nbt.putString("cardboardMaterial", material.name());
-        handle.setTag(nbt);
+        this.handle = CardboardBoxUtils.setCustomData(itemStack, nbt);
     }
 
-    public CompoundTag getTag() {
+    public @NotNull CompoundTag getTag() {
         return tag;
     }
 
-    public void setTag(CompoundTag tag) {
+    public void setTag(@Nullable CompoundTag tag) {
         if (tag == null) tag = new CompoundTag();
-        CompoundTag nbt = handle.getOrCreateTag();
+        CompoundTag nbt = CardboardBoxUtils.getCustomData(handle);
+        if (nbt == null) nbt = new CompoundTag();
         nbt.put("cardboardData", tag);
-        handle.setTag(nbt);
+        handle = CardboardBoxUtils.setCustomData(handle, nbt);
         this.tag = tag;
     }
 
-    public Material getType() {
+    public @NotNull Material getType() {
         return material;
     }
 
-    public void setType(Material material) {
+    public void setType(@Nullable Material material) {
         if (material == null) material = Material.AIR;
-        CompoundTag nbt = handle.getOrCreateTag();
+        CompoundTag nbt = CardboardBoxUtils.getCustomData(handle);
+        if (nbt == null) nbt = new CompoundTag();
         nbt.putString("cardboardMaterial", material.name());
-        handle.setTag(nbt);
+        handle = CardboardBoxUtils.setCustomData(handle, nbt);
         this.material = material;
     }
 
-    public void store(Material material, CompoundTag tag) {
+    public void store(@Nullable Material material, @Nullable CompoundTag tag) {
         this.setTag(tag);
         this.setType(material);
     }
 
-    public ItemStack getItemStack() {
-        return CardboardBoxUtils.updateCardboardBox(CraftItemStack.asBukkitCopy(handle));
+    public @NotNull ItemStack getItemStack() {
+        return CardboardBoxUtils.updateCardboardBox(handle);
     }
 
     public boolean hasData() {
