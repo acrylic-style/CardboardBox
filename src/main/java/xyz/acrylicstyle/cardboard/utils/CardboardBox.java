@@ -13,8 +13,8 @@ public class CardboardBox {
 
     public CardboardBox(@NotNull ItemStack itemStack) {
         this(itemStack,
-                Material.getMaterial(CardboardBoxUtils.getCustomDataOrThrow(itemStack).getString("cardboardMaterial")),
-                CardboardBoxUtils.getCustomDataOrThrow(itemStack).getCompound("cardboardData"));
+                Material.getMaterial(CardboardBoxUtils.getCustomDataOrThrow(itemStack).getString("cardboardMaterial").orElse("AIR")),
+                CardboardBoxUtils.getCustomDataOrThrow(itemStack).getCompound("cardboardData").orElseGet(CompoundTag::new));
     }
 
     public CardboardBox(@NotNull ItemStack itemStack, @Nullable Material material, @Nullable CompoundTag tag) {

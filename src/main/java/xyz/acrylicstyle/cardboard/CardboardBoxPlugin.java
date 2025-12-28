@@ -4,7 +4,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.TagValueInput;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -12,9 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
-import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -199,7 +199,7 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
                         tag.putInt("x", l.getX());
                         tag.putInt("y", l.getY());
                         tag.putInt("z", l.getZ());
-                        blockEntity.loadWithComponents(tag, ((CraftWorld) l.getWorld()).getHandle().registryAccess());
+                        blockEntity.loadWithComponents(TagValueInput.create(ProblemReporter.DISCARDING, ((CraftWorld) l.getWorld()).getHandle().registryAccess(), tag));
                         blockEntity.setLevel(((CraftWorld) l.getWorld()).getHandle());
                         ((CraftWorld) l.getWorld()).getHandle().setBlockEntity(blockEntity);
                     } else {
