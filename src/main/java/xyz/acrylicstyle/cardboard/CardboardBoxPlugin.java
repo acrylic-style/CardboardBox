@@ -32,10 +32,7 @@ import xyz.acrylicstyle.cardboard.commands.CardboardBoxCommand;
 import xyz.acrylicstyle.cardboard.utils.CardboardBox;
 import xyz.acrylicstyle.cardboard.utils.CardboardBoxUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class CardboardBoxPlugin extends JavaPlugin implements Listener {
     public static final Material BLOCK = Material.HONEYCOMB_BLOCK;
@@ -56,6 +53,8 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
         disallowedMaterials.add(Material.BARRIER);
         disallowedMaterials.add(Material.STRUCTURE_BLOCK);
         disallowedMaterials.add(Material.STRUCTURE_VOID);
+        disallowedMaterials.add(Material.TEST_BLOCK);
+        disallowedMaterials.add(Material.TEST_INSTANCE_BLOCK);
 
         // bugged blocks
         // these blocks will cause chunk/block corruption and the server crashes when the server tries to load the affected chunk
@@ -63,34 +62,9 @@ public class CardboardBoxPlugin extends JavaPlugin implements Listener {
         disallowedMaterials.add(Material.PISTON_HEAD);
         disallowedMaterials.add(Material.MOVING_PISTON);
         disallowedMaterials.add(Material.STICKY_PISTON);
-
-        // these blocks will just suck
-        // doors
-        disallowedMaterials.add(Material.DARK_OAK_DOOR);
-        disallowedMaterials.add(Material.ACACIA_DOOR);
-        disallowedMaterials.add(Material.BIRCH_DOOR);
-        disallowedMaterials.add(Material.IRON_DOOR);
-        disallowedMaterials.add(Material.OAK_DOOR);
-        disallowedMaterials.add(Material.JUNGLE_DOOR);
-        disallowedMaterials.add(Material.SPRUCE_DOOR);
-
-        // beds
-        disallowedMaterials.add(Material.BLACK_BED);
-        disallowedMaterials.add(Material.BLUE_BED);
-        disallowedMaterials.add(Material.BROWN_BED);
-        disallowedMaterials.add(Material.CYAN_BED);
-        disallowedMaterials.add(Material.GRAY_BED);
-        disallowedMaterials.add(Material.GREEN_BED);
-        disallowedMaterials.add(Material.LIGHT_BLUE_BED);
-        disallowedMaterials.add(Material.LIGHT_GRAY_BED);
-        disallowedMaterials.add(Material.LIME_BED);
-        disallowedMaterials.add(Material.MAGENTA_BED);
-        disallowedMaterials.add(Material.ORANGE_BED);
-        disallowedMaterials.add(Material.PINK_BED);
-        disallowedMaterials.add(Material.PURPLE_BED);
-        disallowedMaterials.add(Material.RED_BED);
-        disallowedMaterials.add(Material.WHITE_BED);
-        disallowedMaterials.add(Material.YELLOW_BED);
+        Arrays.stream(Material.values()).filter(m -> m.name().endsWith("_DOOR")).forEach(disallowedMaterials::add);
+        Arrays.stream(Material.values()).filter(m -> m.name().endsWith("_BED")).forEach(disallowedMaterials::add);
+        Arrays.stream(Material.values()).filter(m -> m.name().endsWith("_SHELF")).forEach(disallowedMaterials::add);
 
         // other
         disallowedMaterials.add(Material.VINE);
